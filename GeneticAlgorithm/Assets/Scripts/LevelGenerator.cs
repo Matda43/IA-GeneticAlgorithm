@@ -20,6 +20,8 @@ public class LevelGenerator : MonoBehaviour
         generatePlateforms();
         spawnGenerator = GetComponent<SpawnGenerator>();
         spawnGenerator.genese(plateforms[0].transform.position, levelWidth);
+
+        Time.timeScale = 4f;
     }
 
     void Update()
@@ -36,6 +38,8 @@ public class LevelGenerator : MonoBehaviour
             spawnPosition.y += Random.Range(minY, maxY);
             spawnPosition.x = Random.Range(-levelWidth, levelWidth);
             GameObject go = Instantiate(plateformPrefab, spawnPosition, Quaternion.identity);
+            Platform p = go.GetComponent<Platform>();
+            p.setNumero(i);
             plateforms[i] = go;
         }
     }

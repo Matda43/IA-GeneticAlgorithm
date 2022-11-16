@@ -4,6 +4,19 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
+    int numero = -1;
+
+
+    public void setNumero(int new_numero)
+    {
+        numero = new_numero;
+    }
+
+    public int getNumero()
+    {
+        return numero;
+    }
+    /*
     public float jumpForce = 10f;
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -20,4 +33,5 @@ public class Platform : MonoBehaviour
             }
         }
     }
+    */
 }

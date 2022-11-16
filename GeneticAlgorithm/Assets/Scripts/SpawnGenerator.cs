@@ -58,13 +58,12 @@ public class SpawnGenerator : MonoBehaviour
                 int random1 = Random.Range(0, gosKept.Length);
                 Player player1 = doodles[gosKept[random1]].GetComponent<Player>();
                 Player player = doodles[i].GetComponent<Player>();
-                //player.resetPlayer(player1.getDirectionsToFollow().GetRange(0, player1.getNbDirectionsFollowed()-1), defaultSpawnPosition, defaultMinHeight);
-                player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, player1.getDirectionsToFollow().GetRange(0, player1.getNbDirectionsFollowed() - 1));
+                player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, player1.getDirectionsToFollow().GetRange(0, player1.getNbDirectionsFollowed() - 1), player1.getJumpForcesToFollow().GetRange(0, player1.getNbJumpForcesFollowed() - 1));
             }
             else
             {
                 Player player = doodles[i].GetComponent<Player>();
-                player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, player.getDirectionsToFollow());
+                player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, player.getDirectionsToFollow(), player.getJumpForcesToFollow());
             }
         }
     }
@@ -117,7 +116,7 @@ public class SpawnGenerator : MonoBehaviour
         {
             GameObject go = Instantiate(doodlePrefab, defaultSpawnPosition, Quaternion.identity);
             Player player = go.GetComponent<Player>();
-            player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, new List<float>());
+            player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, new List<float>(), new List<float>());
             doodles.Add(go);
         }
     }

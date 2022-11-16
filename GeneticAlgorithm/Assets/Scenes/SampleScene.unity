@@ -336,7 +336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   plateformPrefab: {fileID: 3525377571550231892, guid: 4fbfad8cb2f5bc34c8656bcddc128489, type: 3}
-  numberOfPlatforms: 200
+  numberOfPlatforms: 150
   levelWidth: 3
   minY: 0.2
   maxY: 1.5
@@ -368,5 +368,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   doodlePrefab: {fileID: 2906757375144943897, guid: 0527c7b764581c644862e6a756c53437, type: 3}
-  numberOfDoodles: 10
-  maxGeneration: 10
+  numberOfDoodles: 100
+  maxGeneration: 100
+  nbKept: 15

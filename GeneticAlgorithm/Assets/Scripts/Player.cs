@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -16,12 +17,20 @@ public class Player : MonoBehaviour
     CameraFollow cameraFollow;
 
     Vector3 maxHeightAchieved;
+
+    int plateformReached = -1;
+    int nbTimesPlatfomsReach;
+    
     float minHeight;
 
     bool alive = false;
 
     List<float> directionsToFollow;
     int indiceDirectionToFollow;
+
+    float jumpForceMax = 10f;
+    float jumpForce;
+    List<float> jumpForcesToFollow;
 
     void Start()
     {
@@ -45,6 +54,9 @@ public class Player : MonoBehaviour
                 transform.Rotate(0f, 180.0f, 0.0f, Space.Self);
                 direction = 0;
                 directionRemember = 1f;
+
+                jumpForce = jumpForceMax;
+
             }
             transform.position = maxHeightAchieved;
         }
@@ -55,12 +67,21 @@ public class Player : MonoBehaviour
         if (indiceDirectionToFollow < directionsToFollow.Count)
         {
             direction = directionsToFollow[indiceDirectionToFollow];
+
+            jumpForce = jumpForcesToFollow[indiceDirectionToFollow];
+
             indiceDirectionToFollow++;
         }
         else
         {
             direction = Random.Range(-1, 2);
+            
+
             directionsToFollow.Add(direction);
+
+            jumpForce = (int)Random.Range(5, jumpForceMax);
+            jumpForcesToFollow.Add(jumpForce);
+
             indiceDirectionToFollow++;
         }
     }
@@ -75,15 +96,21 @@ public class Player : MonoBehaviour
 
         direction = 0;
         directionRemember = 1f;
+
+        nbTimesPlatfomsReach = 0;
+
+        this.jumpForce = jumpForceMax;
+
         movement = 0;
         Vector2 velocity = Vector3.zero;
         velocity.x = movement;
         rb.velocity = velocity;
     }
 
-    public void resetPlayer(List<float> directions, Vector3 defaultPosition, float defaultMinHeight)
+    public void resetPlayer(List<float> directions, List<float> jumpForces, Vector3 defaultPosition, float defaultMinHeight)
     {
         directionsToFollow = directions;
+        jumpForcesToFollow = jumpForces;
         resetPlayer(defaultPosition, defaultMinHeight);
     }
 
@@ -125,7 +152,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void initialisation(Vector3 defaultPosition, float new_minHeight, float new_levelWidth, List<float> directions)
+    public void initialisation(Vector3 defaultPosition, float new_minHeight, float new_levelWidth, List<float> directions, List<float> jumpForces)
     {
         movement = 0f;
         direction = 0f;
@@ -133,6 +160,9 @@ public class Player : MonoBehaviour
         this.minHeight = new_minHeight;
         this.levelWidth = new_levelWidth*2;
         this.directionsToFollow = directions;
+
+        this.jumpForcesToFollow = jumpForces;
+
         this.indiceDirectionToFollow = 0;
 
         maxHeightAchieved = transform.position;
@@ -152,7 +182,18 @@ public class Player : MonoBehaviour
         Vector3 position = collision.gameObject.transform.position;
         if (position != null && collision.relativeVelocity.y > 0f)
         {
-            if (position.y >= minHeight)
+            Platform p = collision.gameObject.GetComponent<Platform>();
+            if (p.getNumero() != plateformReached)
+            {
+                plateformReached = p.getNumero();
+                nbTimesPlatfomsReach = 0;
+            }
+            else
+            {
+                nbTimesPlatfomsReach++;
+            }
+
+            if(position.y >= minHeight)
             {
                 minHeight = position.y;
                 updateDirection();
@@ -160,6 +201,14 @@ public class Player : MonoBehaviour
             else if(position.y < (minHeight - 2))
             {
                 alive = false;
+            }
+
+            Rigidbody2D rb = GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                Vector2 velocity = rb.velocity;
+                velocity.y = jumpForce;
+                rb.velocity = velocity;
             }
         }
     }
@@ -184,5 +233,14 @@ public class Player : MonoBehaviour
     {
         return directionsToFollow;
     }
-   
+
+    public List<float> getJumpForcesToFollow()
+    {
+        return jumpForcesToFollow;
+    }
+
+    public int getNbJumpForcesFollowed()
+    {
+        return jumpForcesToFollow.Count;
+    }
 }
