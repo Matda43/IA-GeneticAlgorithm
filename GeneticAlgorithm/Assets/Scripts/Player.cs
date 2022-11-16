@@ -32,6 +32,8 @@ public class Player : MonoBehaviour
     float jumpForce;
     List<float> jumpForcesToFollow;
 
+    List<int> platformsToFollow;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -75,7 +77,6 @@ public class Player : MonoBehaviour
         else
         {
             direction = Random.Range(-1, 2);
-            
 
             directionsToFollow.Add(direction);
 
@@ -107,10 +108,11 @@ public class Player : MonoBehaviour
         rb.velocity = velocity;
     }
 
-    public void resetPlayer(List<float> directions, List<float> jumpForces, Vector3 defaultPosition, float defaultMinHeight)
+    public void resetPlayer(List<float> directions, List<float> jumpForces, List<int> platforms, Vector3 defaultPosition, float defaultMinHeight)
     {
         directionsToFollow = directions;
         jumpForcesToFollow = jumpForces;
+        platformsToFollow = platforms;
         resetPlayer(defaultPosition, defaultMinHeight);
     }
 
@@ -152,7 +154,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void initialisation(Vector3 defaultPosition, float new_minHeight, float new_levelWidth, List<float> directions, List<float> jumpForces)
+    public void initialisation(Vector3 defaultPosition, float new_minHeight, float new_levelWidth, List<float> directions, List<float> jumpForces, List<int> platforms)
     {
         movement = 0f;
         direction = 0f;
@@ -162,6 +164,7 @@ public class Player : MonoBehaviour
         this.directionsToFollow = directions;
 
         this.jumpForcesToFollow = jumpForces;
+        this.platformsToFollow = platforms;
 
         this.indiceDirectionToFollow = 0;
 
@@ -191,11 +194,20 @@ public class Player : MonoBehaviour
             else
             {
                 nbTimesPlatfomsReach++;
+                if(nbTimesPlatfomsReach == 5)
+                {
+                    alive = false;
+                }
             }
 
             if(position.y >= minHeight)
             {
                 minHeight = position.y;
+
+                if (indiceDirectionToFollow >= directionsToFollow.Count)
+                {
+                    platformsToFollow.Add(p.getNumero());
+                }
                 updateDirection();
             }
             else if(position.y < (minHeight - 2))
@@ -242,5 +254,15 @@ public class Player : MonoBehaviour
     public int getNbJumpForcesFollowed()
     {
         return jumpForcesToFollow.Count;
+    }
+
+    public List<int> getPlateformToFollow()
+    {
+        return platformsToFollow;
+    }
+
+    public int getNbPlatformFollowed()
+    {
+        return platformsToFollow.Count;
     }
 }

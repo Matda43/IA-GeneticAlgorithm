@@ -56,14 +56,55 @@ public class SpawnGenerator : MonoBehaviour
             if (!gosKept.Contains(i))
             {
                 int random1 = Random.Range(0, gosKept.Length);
+                int random2 = Random.Range(0, gosKept.Length);
+
                 Player player1 = doodles[gosKept[random1]].GetComponent<Player>();
+                Player player2 = doodles[gosKept[random2]].GetComponent<Player>();
+
                 Player player = doodles[i].GetComponent<Player>();
-                player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, player1.getDirectionsToFollow().GetRange(0, player1.getNbDirectionsFollowed() - 1), player1.getJumpForcesToFollow().GetRange(0, player1.getNbJumpForcesFollowed() - 1));
+
+                List<int> platforms = new List<int>();
+                List<float> directions = new List<float>();
+                List<float> jumpForces = new List<float>();
+                int max1 = player1.getNbDirectionsFollowed();
+                int max2 = player2.getNbDirectionsFollowed();
+                int random3 = Random.Range(0, Mathf.Min(max1,max2));
+                
+                if (max1 < max2) {
+                    platforms = player1.getPlateformToFollow().GetRange(0, random3);
+                    directions = player1.getDirectionsToFollow().GetRange(0, random3);
+                    jumpForces = player1.getJumpForcesToFollow().GetRange(0, random3);
+
+                    for (int indice = random3; indice < max2 - 1; indice++)
+                    {
+                        platforms.Add(player2.getPlateformToFollow()[indice]);
+                        directions.Add(player2.getDirectionsToFollow()[indice]);
+                        jumpForces.Add(player2.getJumpForcesToFollow()[indice]);
+                    }
+                }
+                else
+                {
+                    platforms = player2.getPlateformToFollow().GetRange(0, random3);
+                    directions = player2.getDirectionsToFollow().GetRange(0, random3);
+                    jumpForces = player2.getJumpForcesToFollow().GetRange(0, random3);
+
+                    for (int indice = random3; indice < max1 - 1; indice++)
+                    {
+                        platforms.Add(player1.getPlateformToFollow()[indice]);
+                        directions.Add(player1.getDirectionsToFollow()[indice]);
+                        jumpForces.Add(player1.getJumpForcesToFollow()[indice]);
+                    }
+                }
+
+
+                player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, directions, jumpForces, platforms);
+
+                //player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, player1.getDirectionsToFollow().GetRange(0, player1.getNbDirectionsFollowed() - 1), player1.getJumpForcesToFollow().GetRange(0, player1.getNbJumpForcesFollowed() - 1), player1.getPlateformToFollow().GetRange(0, player1.getNbPlatformFollowed() - 1));
             }
             else
             {
                 Player player = doodles[i].GetComponent<Player>();
-                player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, player.getDirectionsToFollow(), player.getJumpForcesToFollow());
+                player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, player.getDirectionsToFollow(), player.getJumpForcesToFollow(), player.getPlateformToFollow());
             }
         }
     }
@@ -82,6 +123,27 @@ public class SpawnGenerator : MonoBehaviour
         int[] gosKept = new int[nbKept];
         for(int i = 0; i < nbKept; i++)
         {
+            Player player = best[i].GetComponent<Player>();
+            int nb = 0;
+            List<int> platforms = player.getPlateformToFollow();
+            List<float> jumpForces = player.getJumpForcesToFollow();
+            List<float> directions = player.getDirectionsToFollow();
+
+            Debug.Log(platforms.Count + " " + jumpForces.Count + " " + directions.Count);
+
+            while (nb < player.getNbPlatformFollowed()-1)
+            {
+                if(platforms[nb] == platforms[nb + 1])
+                {
+                    platforms.RemoveAt(nb);
+                    jumpForces.RemoveAt(nb);
+                    directions.RemoveAt(nb);
+                }
+                else
+                {
+                    nb++;
+                }
+            }
             gosKept[i] = doodles.IndexOf(best[i]);
         }
         best.Clear();
@@ -116,7 +178,14 @@ public class SpawnGenerator : MonoBehaviour
         {
             GameObject go = Instantiate(doodlePrefab, defaultSpawnPosition, Quaternion.identity);
             Player player = go.GetComponent<Player>();
-            player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, new List<float>(), new List<float>());
+            if (generation == 1)
+            {
+                player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, new List<float>(), new List<float>(), new List<int>() { 0 });
+            }
+            else
+            {
+                player.initialisation(defaultSpawnPosition, defaultMinHeight, defaultLevelWidth, new List<float>(), new List<float>(), new List<int>());
+            }
             doodles.Add(go);
         }
     }
